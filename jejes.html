@@ -1,0 +1,391 @@
+```html
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>KENALI, PAHAMI, ATASI! • Simulasi Interaktif Manajemen Stres Akademik</title>
+
+  <!-- Google Fonts: Plus Jakarta Sans & Nunito -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,400;0,600;0,700;0,800;1,400&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet" />
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Tone.js untuk efek suara menenangkan opsional -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            jakarta: ['"Plus Jakarta Sans"', 'sans-serif'],
+            nunito: ['"Nunito"', 'sans-serif'],
+          },
+          colors: {
+            offwhite: '#FAF9F5',
+            sage: {
+              50: '#F2F7F4',
+              100: '#E1EDE6',
+              200: '#C4DDD0',
+              300: '#9BC4B0',
+              400: '#71A68D',
+              500: '#538A71',
+              600: '#406E59',
+              700: '#355849',
+              800: '#2C473C',
+              900: '#253B32',
+            },
+            calming: {
+              50: '#EFF8F8',
+              100: '#D7EFEF',
+              200: '#B3DFE0',
+              300: '#7FC7CA',
+              400: '#49A7AC',
+              500: '#2E8B90',
+              600: '#277177',
+              700: '#245C62',
+              800: '#234D52',
+              900: '#214146',
+            },
+            skysoft: {
+              50: '#F0F7FC',
+              100: '#DFEFF9',
+              200: '#C5E2F4',
+              300: '#9BCDEC',
+              400: '#6AB1E0',
+              500: '#4794CE',
+              600: '#3577B1',
+              700: '#2C6090',
+            },
+            amberwarm: {
+              50: '#FDF8EE',
+              100: '#FAF0D7',
+              200: '#F4DEAE',
+              300: '#EDC77B',
+              400: '#E5AA4A',
+              500: '#DC8E28',
+              600: '#C2711E',
+            },
+            coralsoft: {
+              50: '#FEF5F3',
+              100: '#FDE8E3',
+              200: '#FCD4CB',
+              300: '#F8B5A6',
+              400: '#F18B75',
+              500: '#E5674D',
+            }
+          },
+          boxShadow: {
+            soft: '0 10px 30px -5px rgba(45, 92, 85, 0.08), 0 4px 12px -2px rgba(45, 92, 85, 0.04)',
+            card: '0 14px 36px -8px rgba(38, 77, 72, 0.10)',
+          }
+        }
+      }
+    };
+  </script>
+
+  <style>
+    body {
+      font-family: 'Nunito', sans-serif;
+      background-color: #FAF9F5;
+      color: #243B37;
+      overflow-x: hidden;
+    }
+
+    h1, h2, h3, h4, .font-heading {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    /* Latar belakang organik halus */
+    .bg-botanical {
+      background-color: #FAF9F5;
+      background-image:
+        radial-gradient(at 8% 10%, rgba(196, 221, 208, 0.42) 0px, transparent 48%),
+        radial-gradient(at 92% 14%, rgba(197, 226, 244, 0.45) 0px, transparent 48%),
+        radial-gradient(at 82% 88%, rgba(215, 239, 239, 0.45) 0px, transparent 50%),
+        radial-gradient(at 15% 88%, rgba(250, 240, 215, 0.38) 0px, transparent 45%);
+    }
+
+    /* Animasi transisi antar kartu soal */
+    @keyframes slideFadeIn {
+      0% {
+        opacity: 0;
+        transform: translateY(16px) scale(0.99);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    .animate-card-enter {
+      animation: slideFadeIn 0.42s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+
+    @keyframes floatSlow {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-5px); }
+    }
+
+    .animate-float {
+      animation: floatSlow 4s ease-in-out infinite;
+    }
+
+    /* Mikro-interaksi tombol pilihan jawaban */
+    .option-btn {
+      transition: all 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .option-btn:not(:disabled):hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px -4px rgba(46, 139, 144, 0.14);
+    }
+    .option-btn:not(:disabled):active {
+      transform: translateY(0px) scale(0.995);
+    }
+
+    /* Lingkaran pernapasan 4-4-4 */
+    .breathing-orb {
+      transition: transform 4s cubic-bezier(0.4, 0, 0.2, 1), background-color 1.5s ease, box-shadow 4s ease;
+    }
+
+    /* Progress ring skor */
+    .score-ring-circle {
+      transition: stroke-dashoffset 1.3s cubic-bezier(0.22, 1, 0.36, 1);
+      transform: rotate(-90deg);
+      transform-origin: 50% 50%;
+    }
+
+    /* Custom scrollbar lembut */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #F2F7F4;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #B3DFE0;
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #7FC7CA;
+    }
+  </style>
+</head>
+<body class="bg-botanical min-h-screen flex flex-col antialiased selection:bg-sage-200 selection:text-sage-900">
+
+  <!-- Toast Notification (Pengganti alert) -->
+  <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none max-w-xs sm:max-w-sm"></div>
+
+  <!-- ========================================================= -->
+  <!-- 1. HALAMAN PEMBUKA (WELCOME SCREEN)                       -->
+  <!-- ========================================================= -->
+  <main id="screen-welcome" class="flex-1 flex items-center justify-center px-4 py-8 sm:py-12">
+    <div class="w-full max-w-4xl animate-card-enter">
+      <!-- Kartu Utama Welcome -->
+      <div class="bg-white/95 backdrop-blur-md rounded-3xl shadow-card border border-sage-200/70 overflow-hidden">
+        <!-- Dekorasi Pita Atas -->
+        <div class="h-2.5 w-full bg-gradient-to-r from-sage-400 via-calming-400 to-skysoft-400"></div>
+
+        <div class="p-6 sm:p-10 lg:p-12">
+          <!-- Header & Badge -->
+          <div class="flex flex-col lg:flex-row items-center gap-8 lg:gap-10">
+            <!-- Kolom Kiri: Teks & Informasi -->
+            <div class="flex-1 text-center lg:text-left">
+              <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-sage-100/90 border border-sage-200 text-sage-800 text-xs sm:text-sm font-bold tracking-wide mb-4">
+                <span class="w-2 h-2 rounded-full bg-calming-500 animate-pulse"></span>
+                Media Interaktif Bimbingan &amp; Konseling • Kelas X SMA
+              </div>
+
+              <h1 class="text-3xl sm:text-4xl lg:text-[2.65rem] font-extrabold text-slate-800 tracking-tight leading-tight mb-2">
+                KENALI, PAHAMI, <span class="text-transparent bg-clip-text bg-gradient-to-r from-sage-600 to-calming-600">ATASI!</span>
+              </h1>
+
+              <p class="text-lg sm:text-xl font-bold text-calming-700 font-heading mb-4">
+                Simulasi Interaktif Manajemen Stres Akademik
+              </p>
+
+              <p class="text-slate-600 text-sm sm:text-base leading-relaxed mb-6">
+                Latih kemampuanmu menghadapi berbagai tantangan belajar di SMA melalui 10 studi kasus nyata. Temukan strategi sehat untuk mengenali tekanan, menenangkan pikiran, dan menjaga keseimbangan diri.
+              </p>
+
+              <!-- 3 Pilar Pendekatan -->
+              <div class="flex flex-wrap justify-center lg:justify-start gap-2 mb-6">
+                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-skysoft-50 border border-skysoft-200 text-skysoft-700 text-xs font-bold">
+                  <span>🔍</span> 1. Kenali Sumber Stres
+                </span>
+                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-amberwarm-50 border border-amberwarm-200 text-amberwarm-600 text-xs font-bold">
+                  <span>💡</span> 2. Pahami Respons Diri
+                </span>
+                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-sage-50 border border-sage-200 text-sage-700 text-xs font-bold">
+                  <span>🌱</span> 3. Atasi Secara Sehat
+                </span>
+              </div>
+            </div>
+
+            <!-- Kolom Kanan: Ilustrasi SVG Konseling & Keseimbangan -->
+            <div class="w-56 sm:w-64 lg:w-72 flex-shrink-0 animate-float">
+              <svg viewBox="0 0 280 250" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full h-auto drop-shadow-sm" aria-label="Ilustrasi Manajemen Stres Akademik Siswa SMA">
+                <!-- Lingkaran latar menenangkan -->
+                <circle cx="140" cy="128" r="102" fill="#E1EDE6" opacity="0.65"/>
+                <circle cx="140" cy="128" r="80" fill="#D7EFEF" opacity="0.75"/>
+                <!-- Daun organik -->
+                <path d="M52 156C34 134 38 102 62 92C68 118 66 138 52 156Z" fill="#9BC4B0"/>
+                <path d="M228 152C246 130 242 98 218 88C212 114 214 134 228 152Z" fill="#7FC7CA"/>
+                <!-- Buku & elemen belajar melayang -->
+                <rect x="44" y="54" width="46" height="34" rx="10" fill="#FFFFFF" stroke="#C5E2F4" stroke-width="2.5"/>
+                <path d="M56 67H78M56 75H70" stroke="#4794CE" stroke-width="2.5" stroke-linecap="round"/>
+                <!-- Ikon hati / ketenangan -->
+                <rect x="192" y="48" width="46" height="34" rx="10" fill="#FFFFFF" stroke="#F4DEAE" stroke-width="2.5"/>
+                <path d="M215 72C215 72 204 64.5 204 58.5C204 55.2 206.5 53 209.5 53C211.4 53 213.2 54 215 55.8C216.8 54 218.6 53 220.5 53C223.5 53 226 55.2 226 58.5C226 64.5 215 72 215 72Z" fill="#F18B75"/>
+                <!-- Karakter Siswa SMA Tersenyum Tenang -->
+                <!-- Bahu & Seragam Putih Abu-abu -->
+                <path d="M88 215C88 184 110 168 140 168C170 168 192 184 192 215" fill="#FFFFFF" stroke="#355849" stroke-width="2.5" stroke-linecap="round"/>
+                <!-- Kerah & Dasi SMA -->
+                <path d="M126 169L140 186L154 169" fill="#E1EDE6" stroke="#355849" stroke-width="2" stroke-linejoin="round"/>
+                <path d="M140 184L135 208L140 214L145 208L140 184Z" fill="#4794CE"/>
+                <!-- Saku OSIS -->
+                <rect x="155" y="191" width="16" height="18" rx="3" fill="#EFF8F8" stroke="#7FC7CA" stroke-width="1.5"/>
+                <!-- Leher -->
+                <rect x="132" y="150" width="16" height="22" rx="8" fill="#F7D3BA"/>
+                <!-- Kepala -->
+                <ellipse cx="140" cy="122" rx="33" ry="36" fill="#FBE0CC"/>
+                <!-- Rambut rapi -->
+                <path d="M107 118C107 95 121 82 140 82C159 82 173 95 173 118C173 107 164 98 153 98C144 98 138 103 128 103C117 103 107 108 107 118Z" fill="#2C3E40"/>
+                <!-- Mata tersenyum tenang -->
+                <path d="M124 121C126 118 131 118 133 121" stroke="#2C3E40" stroke-width="2.5" stroke-linecap="round"/>
+                <path d="M147 121C149 118 154 118 156 121" stroke="#2C3E40" stroke-width="2.5" stroke-linecap="round"/>
+                <!-- Pipi hangat -->
+                <ellipse cx="121" cy="129" rx="5" ry="3" fill="#F8B5A6" opacity="0.6"/>
+                <ellipse cx="159" cy="129" rx="5" ry="3" fill="#F8B5A6" opacity="0.6"/>
+                <!-- Senyum ramah -->
+                <path d="M132 136C136 141 144 141 148 136" stroke="#2C3E40" stroke-width="2.5" stroke-linecap="round"/>
+                <!-- Bintang kecil ketenangan -->
+                <circle cx="96" cy="108" r="3.5" fill="#E5AA4A"/>
+                <circle cx="186" cy="104" r="3" fill="#538A71"/>
+              </svg>
+            </div>
+          </div>
+
+          <!-- Kartu Informasi Ringkas (4 Grid) -->
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 my-7">
+            <div class="bg-sage-50/90 border border-sage-200/80 rounded-2xl p-3.5 sm:p-4 text-center">
+              <div class="w-9 h-9 mx-auto mb-2 rounded-xl bg-sage-200/70 text-sage-800 flex items-center justify-center">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 14l9-5-9-5-9 5 9 5z"/><path stroke-linecap="round" stroke-linejoin="round" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"/></svg>
+              </div>
+              <p class="text-[11px] uppercase tracking-wider font-bold text-sage-600">Sasaran</p>
+              <p class="text-sm sm:text-base font-extrabold text-slate-800 mt-0.5">Siswa Kelas X SMA</p>
+            </div>
+
+            <div class="bg-calming-50/90 border border-calming-200/80 rounded-2xl p-3.5 sm:p-4 text-center">
+              <div class="w-9 h-9 mx-auto mb-2 rounded-xl bg-calming-200/70 text-calming-800 flex items-center justify-center">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
+              </div>
+              <p class="text-[11px] uppercase tracking-wider font-bold text-calming-600">Jumlah Soal</p>
+              <p class="text-sm sm:text-base font-extrabold text-slate-800 mt-0.5">10 Pilihan Ganda</p>
+            </div>
+
+            <div class="bg-skysoft-50/90 border border-skysoft-200/80 rounded-2xl p-3.5 sm:p-4 text-center">
+              <div class="w-9 h-9 mx-auto mb-2 rounded-xl bg-skysoft-200/70 text-skysoft-700 flex items-center justify-center">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+              </div>
+              <p class="text-[11px] uppercase tracking-wider font-bold text-skysoft-600">Waktu</p>
+              <p class="text-sm sm:text-base font-extrabold text-slate-800 mt-0.5">20 Menit</p>
+            </div>
+
+            <div class="bg-amberwarm-50/90 border border-amberwarm-200/80 rounded-2xl p-3.5 sm:p-4 text-center">
+              <div class="w-9 h-9 mx-auto mb-2 rounded-xl bg-amberwarm-200/70 text-amberwarm-600 flex items-center justify-center">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/></svg>
+              </div>
+              <p class="text-[11px] uppercase tracking-wider font-bold text-amberwarm-600">Skor Maksimal</p>
+              <p class="text-sm sm:text-base font-extrabold text-slate-800 mt-0.5">100 Poin</p>
+            </div>
+          </div>
+
+          <!-- Form Identitas Opsional -->
+          <div class="bg-offwhite border border-sage-200/80 rounded-2xl p-4 sm:p-6 mb-7">
+            <div class="flex items-center justify-between mb-3">
+              <label class="text-sm font-bold text-slate-700 flex items-center gap-2">
+                <span class="w-6 h-6 rounded-lg bg-calming-100 text-calming-700 inline-flex items-center justify-center text-xs font-extrabold">✎</span>
+                Identitas Peserta <span class="text-xs font-normal text-slate-500">(Opsional untuk kartu hasil akhir)</span>
+              </label>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+              <div>
+                <label for="input-nama" class="block text-xs font-bold text-slate-600 mb-1">Nama Lengkap</label>
+                <input
+                  type="text"
+                  id="input-nama"
+                  placeholder="Contoh: Nadya Putri (kosongkan jika anonim)"
+                  maxlength="50"
+                  class="w-full px-4 py-3 rounded-xl bg-white border border-sage-200 text-slate-800 placeholder-slate-400 text-sm focus:outline-none focus:ring-2 focus:ring-calming-400 focus:border-calming-400 transition"
+                />
+              </div>
+              <div>
+                <label for="input-kelas" class="block text-xs font-bold text-slate-600 mb-1">Kelas</label>
+                <input
+                  type="text"
+                  id="input-kelas"
+                  placeholder="Contoh: X IPA 1 atau X-1"
+                  maxlength="25"
+                  class="w-full px-4 py-3 rounded-xl bg-white border border-sage-200 text-slate-800 placeholder-slate-400 text-sm focus:outline-none focus:ring-2 focus:ring-calming-400 focus:border-calming-400 transition"
+                />
+              </div>
+            </div>
+          </div>
+
+          <!-- Tombol Mulai Simulasi -->
+          <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
+            <button
+              type="button"
+              onclick="openBreathingModal()"
+              class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-3.5 rounded-2xl bg-calming-50 hover:bg-calming-100 text-calming-800 border border-calming-200 font-bold text-sm transition cursor-pointer"
+            >
+              <span>🌿</span> Coba Latihan Napas 10 Detik
+            </button>
+
+            <button
+              type="button"
+              id="btn-start-quiz"
+              onclick="startSimulation()"
+              class="w-full sm:w-auto flex-1 sm:max-w-sm inline-flex items-center justify-center gap-3 px-8 py-4 rounded-2xl bg-gradient-to-r from-sage-600 to-calming-600 hover:from-sage-700 hover:to-calming-700 text-white font-heading font-extrabold text-base sm:text-lg shadow-lg shadow-calming-600/20 hover:shadow-xl hover:-translate-y-0.5 active:translate-y-0 transition cursor-pointer"
+            >
+              <span>Mulai Simulasi Sekarang</span>
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- ========================================================= -->
+  <!-- 2. HALAMAN SIMULASI INTERAKTIF (10 SOAL STUDI KASUS)      -->
+  <!-- ========================================================= -->
+  <section id="screen-quiz" class="hidden flex-1 flex flex-col">
+    <!-- Header Navigasi Atas Sticky -->
+    <header class="sticky top-0 z-30 bg-white/92 backdrop-blur-md border-b border-sage-200/80 shadow-sm">
+      <div class="max-w-4xl mx-auto px-4 py-3">
+        <!-- Baris Atas Header: Nama Peserta, Skor, Timer, Latihan Napas, Suara -->
+        <div class="flex flex-wrap items-center justify-between gap-2 mb-2.5">
+          <!-- Identitas Peserta -->
+          <div class="flex items-center gap-2 min-w-0">
+            <div class="w-8 h-8 rounded-xl bg-sage-100 text-sage-700 flex items-center justify-center font-extrabold text-sm flex-shrink-0">
+              🎓
+            </div>
+            <div class="truncate">
+              <p id="header-student-name" class="text-xs sm:text-sm font-extrabold text-slate-800 truncate">Siswa Kelas X</p>
+              <p id="header-student-class" class="text-[11px] font-semibold text-slate-500 truncate">Kelas X SMA</p>
+            </div>
+          </div>
+
+          <!-- Kontrol Kanan: Skor, Timer, Latihan Napas, Audio -->
+          <div class="flex items-center gap-1.5 sm:gap-2.5 flex-wrap">
+            <!-- Skor Sementara -->
+            <div class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amberwarm-50 border border-amberwarm-200 text-amberwarm-600 text-xs sm:text-sm font-extrabold">
+              <span>⭐</span>
+              <span>Skor: <span id="header-score">0</sp
